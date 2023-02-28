@@ -18,22 +18,22 @@ public class PostController {
         return postService.getPosts();
     }
 
-    @GetMapping("/api/post/{id}")
+    @GetMapping("/api/posts/{id}")
     public Post getOnePost(@PathVariable Long id) {
         return postService.getOnePost(id);
     }
 
-    @PostMapping("/api/post")
+    @PostMapping("/api/posts")
     public Post createPost(@RequestBody PostRequestDto requestDto) {
         return postService.createPost(requestDto);
     }
 
-    @PutMapping("/api/post/{id}")
+    @PutMapping("/api/posts/{id}")
     public Post updatePost(@PathVariable Long id, @RequestBody PostRequestDto requestDto) {
         return postService.updatePost(id, requestDto);
     }
 
-    @DeleteMapping("/api/post/{id}")
+    @DeleteMapping("/api/posts/{id}")
     public String deletePost(@PathVariable Long id, @RequestBody PostRequestDto requestDto) {
         return postService.deletePost(id, requestDto);
     }
