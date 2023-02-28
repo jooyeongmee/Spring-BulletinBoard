@@ -16,7 +16,7 @@ public class PostService {
     private final PostRepository postRepository;
     @Transactional(readOnly = true)
     public List<Post> getPosts() {
-        return postRepository.findAll();
+        return postRepository.findAllByOrderByCreatedAtDesc();
     }
 
     @Transactional
@@ -56,6 +56,7 @@ public class PostService {
     public String deletePost(Long id, PostRequestDto requestDto) {
         Post post = checkPassword(id, requestDto);
         postRepository.deleteById(id);
-        return "success: true";
+        return "{success: true}";
     }
 }
+
