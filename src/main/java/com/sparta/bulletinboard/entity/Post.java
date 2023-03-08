@@ -1,5 +1,6 @@
 package com.sparta.bulletinboard.entity;
 
+import com.sparta.bulletinboard.dto.PostRequestDto;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
@@ -20,9 +21,9 @@ public class Post extends Timestamped{
     @Column(nullable = false)
     private String username;
 
-    public Post(String title, String content, String username) {
-        this.title = title;
-        this.content = content;
+    public Post(PostRequestDto requestDto, String username) {
+        this.title = requestDto.getTitle();
+        this.content = requestDto.getContent();
         this.username = username;
     }
 

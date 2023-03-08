@@ -65,7 +65,7 @@ public class PostService {
     @Transactional
     public Post createPost(PostRequestDto requestDto, HttpServletRequest request) {
         User user = checkToken(request);
-        Post post = new Post(requestDto.getTitle(), requestDto.getContent(), user.getUsername());
+        Post post = new Post(requestDto, user.getUsername());
         postRepository.save(post);
         return post;
     }
