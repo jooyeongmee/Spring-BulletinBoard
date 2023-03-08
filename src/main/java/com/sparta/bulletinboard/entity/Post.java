@@ -1,8 +1,9 @@
 package com.sparta.bulletinboard.entity;
 
-import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+
+import javax.persistence.*;
 
 @Entity
 @Getter
@@ -17,21 +18,16 @@ public class Post extends Timestamped{
     private String content;
 
     @Column(nullable = false)
-    private String password;
+    private String username;
 
-    @Column(nullable = false)
-    private String author;
-
-    public Post(String title, String content, String author, String password) {
+    public Post(String title, String content, String username) {
         this.title = title;
         this.content = content;
-        this.author = author;
-        this.password = password;
+        this.username = username;
     }
 
-    public void update(String title, String content, String author) {
+    public void update(String title, String content) {
         this.title = title;
         this.content = content;
-        this.author = author;
     }
 }
