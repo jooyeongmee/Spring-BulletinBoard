@@ -1,9 +1,11 @@
-package com.sparta.bulletinboard.dto;
+package com.sparta.bulletinboard.dto.response;
 
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 
 @Getter
-public class ResponseMessageDto {
+@NoArgsConstructor
+public class ResponseMessageDto implements ResponseDto{
     private String msg;
     private int statusCode;
 

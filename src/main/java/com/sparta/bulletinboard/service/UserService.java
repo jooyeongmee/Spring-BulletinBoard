@@ -1,9 +1,10 @@
 package com.sparta.bulletinboard.service;
 
-import com.sparta.bulletinboard.dto.LoginRequestDto;
-import com.sparta.bulletinboard.dto.ResponseMessageDto;
-import com.sparta.bulletinboard.dto.SignupRequestDto;
+import com.sparta.bulletinboard.dto.request.LoginRequestDto;
+import com.sparta.bulletinboard.dto.response.ResponseMessageDto;
+import com.sparta.bulletinboard.dto.request.SignupRequestDto;
 import com.sparta.bulletinboard.entity.User;
+import com.sparta.bulletinboard.entity.UserRoleEnum;
 import com.sparta.bulletinboard.jwt.JwtUtil;
 import com.sparta.bulletinboard.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
@@ -20,6 +21,8 @@ import java.util.Optional;
 public class UserService {
     private final UserRepository userRepository;
     private final JwtUtil jwtUtil;
+
+    private static final String ADMIN_TOKEN = "AAABnvxRVklrnYxKZ0aHgTBcXukeZygoC";
     @Transactional
     public ResponseEntity<ResponseMessageDto> signup(SignupRequestDto signupRequestDto) {
         String username = signupRequestDto.getUsername();
@@ -28,10 +31,17 @@ public class UserService {
         // 회원 중복 확인
         Optional<User> found = userRepository.findByUsername(username);
         if (found.isPresent()) {
-            throw new IllegalArgumentException("중복된 사용자가 존재합니다.");
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new ResponseMessageDto("중복된 username 입니다.", HttpStatus.BAD_REQUEST.value()));
         }
-
-        User user = new User(username, password);
+        // 사용자 ROLE 확인
+        UserRoleEnum role = UserRoleEnum.USER;
+        if (signupRequestDto.isCheckAdmin()) {
+            if (!signupRequestDto.getAdminToken().equals(ADMIN_TOKEN)) {
+                return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new ResponseMessageDto("관리자 암호가 틀려 등록이 불가능합니다.", HttpStatus.BAD_REQUEST.value()));
+            }
+            role = UserRoleEnum.ADMIN;
+        }
+        User user = new User(username, password, role);
         userRepository.save(user);
 
         return ResponseEntity.status(HttpStatus.OK).body(new ResponseMessageDto("회원가입 성공", HttpStatus.OK.value()));
@@ -48,10 +58,10 @@ public class UserService {
         );
         // 비밀번호 확인
         if(!user.getPassword().equals(password)){
-            throw  new IllegalArgumentException("비밀번호가 일치하지 않습니다.");
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new ResponseMessageDto("회원을 찾을 수 없습니다.", HttpStatus.BAD_REQUEST.value()));
         }
 
-        response.addHeader(JwtUtil.AUTHORIZATION_HEADER, jwtUtil.createToken(user.getUsername()));
+        response.addHeader(JwtUtil.AUTHORIZATION_HEADER, jwtUtil.createToken(user.getUsername(), user.getRole()));
         return ResponseEntity.status(HttpStatus.OK).body(new ResponseMessageDto("로그인 성공", HttpStatus.OK.value()));
     }
 }

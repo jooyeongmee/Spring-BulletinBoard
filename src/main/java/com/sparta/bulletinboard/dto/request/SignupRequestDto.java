@@ -1,4 +1,4 @@
-package com.sparta.bulletinboard.dto;
+package com.sparta.bulletinboard.dto.request;
 
 import lombok.Getter;
 import lombok.Setter;
@@ -16,6 +16,10 @@ public class SignupRequestDto {
     private String username;
 
     @NotNull
-    @Pattern(regexp = "^[a-zA-Z0-9]{8,15}$")
+    @Pattern(regexp = "^[a-zA-Z0-9`~!@#$%^&*()-_=+]{8,15}$")
     private String password;
+
+    private boolean checkAdmin;
+    private String adminToken;
+
 }

@@ -1,12 +1,17 @@
 package com.sparta.bulletinboard.jwt;
 
 
+import com.sparta.bulletinboard.dto.response.ResponseMessageDto;
+import com.sparta.bulletinboard.dto.response.UserResponseDto;
+import com.sparta.bulletinboard.entity.UserRoleEnum;
 import io.jsonwebtoken.*;
 import io.jsonwebtoken.security.Keys;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Component;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.StringUtils;
 
 
@@ -47,13 +52,13 @@ public class JwtUtil {
     }
 
     // 토큰 생성
-    public String createToken(String username) {
+    public String createToken(String username, UserRoleEnum role) {
         Date date = new Date();
 
         return BEARER_PREFIX +
                 Jwts.builder()
                         .setSubject(username)
-                        .claim(AUTHORIZATION_KEY, username)
+                        .claim(AUTHORIZATION_KEY, role)
                         .setExpiration(new Date(date.getTime() + TOKEN_TIME))
                         .setIssuedAt(date)
                         .signWith(key, signatureAlgorithm)
@@ -77,9 +82,29 @@ public class JwtUtil {
         return false;
     }
 
-    // 토큰에서 사용자 정보 가져오기
-    public Claims getUserInfoFromToken(String token) {
-        return Jwts.parserBuilder().setSigningKey(key).build().parseClaimsJws(token).getBody();
+    @Transactional
+    public UserResponseDto getUserInfoFromToken(HttpServletRequest request) {
+        // Request에서 Token 가져오기
+        String token = resolveToken(request);
+        Claims claims;
+        String str_role;
+        UserRoleEnum role = UserRoleEnum.ADMIN;
+
+        UserResponseDto userResponseDto = new UserResponseDto();
+        if (token == null || !validateToken(token)) {
+            userResponseDto.setResponse(new ResponseMessageDto("토큰이 유효하지 않습니다.", HttpStatus.BAD_REQUEST.value()));
+            return userResponseDto;
+        }
+        claims = Jwts.parserBuilder().setSigningKey(key).build().parseClaimsJws(token).getBody();
+        str_role = (String)claims.get(AUTHORIZATION_KEY);
+        System.out.println("rollllle ========" + str_role);
+        if (str_role.equals("USER")) {
+            role = UserRoleEnum.USER;
+        }
+        System.out.println("rollllle111111 ========" + role);
+        userResponseDto.setUsername(claims.getSubject());
+        userResponseDto.setRole(role);
+        return userResponseDto;
     }
 
 }

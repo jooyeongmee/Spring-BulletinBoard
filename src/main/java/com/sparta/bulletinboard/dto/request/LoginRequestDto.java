@@ -1,4 +1,4 @@
-package com.sparta.bulletinboard.dto;
+package com.sparta.bulletinboard.dto.request;
 
 import lombok.Getter;
 import lombok.Setter;
