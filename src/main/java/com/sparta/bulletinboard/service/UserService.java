@@ -27,8 +27,8 @@ public class UserService {
         String password = signupRequestDto.getPassword();
 
         // 회원 중복 확인
-        Optional<User> found = userRepository.findByUsername(username);
-        if (found.isPresent()) {
+        boolean found = userRepository.findByUsername(username).isPresent();
+        if (found) {
             throw new CustomException(ErrorCode.DUPLICATE_USER);
         }
 
