@@ -1,8 +1,9 @@
 package com.sparta.bulletinboard.controller;
 
 import com.sparta.bulletinboard.dto.PostRequestDto;
-import com.sparta.bulletinboard.dto.ResponseMessageDto;
 import com.sparta.bulletinboard.entity.Post;
+import com.sparta.bulletinboard.exception.ResponseMessage;
+import com.sparta.bulletinboard.jwt.JwtUtil;
 import com.sparta.bulletinboard.service.PostService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -16,6 +17,7 @@ import java.util.List;
 @RequestMapping("/api")
 public class PostController {
     private final PostService postService;
+    private final JwtUtil jwtUtil;
 
     @GetMapping("/posts")
     public List<Post> getPosts(){
@@ -29,17 +31,17 @@ public class PostController {
 
     @PostMapping("/posts")
     public Post createPost(@RequestBody PostRequestDto requestDto, HttpServletRequest request) {
-
-        return postService.createPost(requestDto, request);
+        return postService.createPost(requestDto, jwtUtil.getUserInfoFromToken(request));
     }
 
     @PutMapping("/posts/{id}")
     public Post updatePost(@PathVariable Long id, @RequestBody PostRequestDto requestDto, HttpServletRequest request) {
-        return postService.updatePost(id, requestDto, request);
+        return postService.updatePost(id, requestDto, jwtUtil.getUserInfoFromToken(request));
     }
 
     @DeleteMapping("/posts/{id}")
-    public ResponseEntity<ResponseMessageDto> deletePost(@PathVariable Long id, HttpServletRequest request) {
-        return postService.deletePost(id, request);
+    public ResponseEntity<ResponseMessage> deletePost(@PathVariable Long id, HttpServletRequest request) {
+        String responseMessage = postService.deletePost(id, jwtUtil.getUserInfoFromToken(request));
+        return ResponseMessage.SuccessResponse(responseMessage);
     }
 }

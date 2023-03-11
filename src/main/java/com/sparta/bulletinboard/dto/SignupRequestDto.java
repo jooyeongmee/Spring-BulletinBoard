@@ -7,7 +7,7 @@ import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Pattern;
 import javax.validation.constraints.Size;
 
-@Setter
+
 @Getter
 public class SignupRequestDto {
 
@@ -16,6 +16,10 @@ public class SignupRequestDto {
     private String username;
 
     @NotNull
-    @Pattern(regexp = "^[a-zA-Z0-9]{8,15}$")
+    @Pattern(regexp = "^[a-zA-Z0-9`~!@#$%^&*()-_=+]{8,15}$")
     private String password;
+
+    private boolean checkAdmin;
+    private String adminToken;
+
 }
